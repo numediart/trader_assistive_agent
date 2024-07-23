@@ -1,8 +1,9 @@
-# multisensor_llm
+# Multisensor_llm
 
+Project description
 
-# Message Queuing
-pre-requisites : 
-[-] run docker server : 
-[ ] docker run -it --rm --name rabbitmq -p 5672:5672 -p 15672:15672 rabbitmq:3.13-management
+# Pre-requisites :
+## Message Queuing :
+run docker server :
 
+docker run -it --rm --name rabbitmq -p 5672:5672 -p 15672:15672 rabbitmq:3.13-management
