@@ -1,24 +1,10 @@
 # -*- coding: utf-8 -*-
-import pickle
 import os
-import sys
-import matplotlib.pyplot as plt
-import numpy as np
-from langchain.prompts import ChatPromptTemplate
-from langchain_community.vectorstores import Chroma
-from langchain_core.output_parsers import StrOutputParser
-from langchain_core.runnables import RunnablePassthrough
 from langchain_huggingface import HuggingFaceEmbeddings
-
 import os
-import pandas as pd
-
 # You might need to setup your grok api key
-os.environ["GROQ_API_KEY"]  = ""
-
+# os.environ["GROQ_API_KEY"]  = ""
 from langchain_groq import ChatGroq
-
-from types import SimpleNamespace
 from rag_utils import rag_utils as rag
 #%%
 base_path = './Data' #You might need to edit it
