@@ -1,2 +1,5 @@
-Tools/
 __pycache__
+.huggingface
+mlx_models
+Tools/
+trail_env
