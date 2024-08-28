@@ -43,7 +43,7 @@ class RAG:
                     metadata={'method_name': row['Method Name']}
                 )
                 documents.append(document)
-            except Exception as e:
+            except:
                 document = SimpleNamespace(
                     page_content=f"{row[0]}",
                     metadata={}
@@ -82,7 +82,7 @@ class RAG:
         if self.retriever is None:
             self.create_retriever(search_kwargs = {'k':2,})
         if print_context:
-            print(retriever.invoke(question))
+            print(self.retriever.invoke(question))
         prompt = ChatPromptTemplate.from_template(template)
         chain = (
             {"context": self.retriever, 
