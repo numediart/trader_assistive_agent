@@ -11,7 +11,6 @@ class DialogManagerHandler(BaseHandler):
             prompt_creator=None
     ):
         self.device = device
-        self.choice = {"question": "answer", "prompt": "chill dude..."}
         self.rag=rag
         self.prompt_creator=prompt_creator
         self.warmup()
@@ -23,6 +22,7 @@ class DialogManagerHandler(BaseHandler):
     def process(self, prompt):
         prompt = prompt.decode("utf-8")
         text_type = "question" if prompt.endswith("?") else "prompt"
+
         if text_type == "question":
             answer = self.rag.retrieve_answer(
                 prompt
@@ -31,6 +31,5 @@ class DialogManagerHandler(BaseHandler):
         elif text_type == "prompt":
             # request spontaneous answer
             answer = "chill dude..."
-            pass
 
         yield answer
