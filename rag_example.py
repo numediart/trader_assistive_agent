@@ -6,7 +6,7 @@ import os
 # os.environ["GROQ_API_KEY"]  = ""
 from langchain_groq import ChatGroq
 from rag_utils import rag_utils as rag
-#%%
+#%% Init the rag.RAG object
 base_path = './Data' #You might need to edit it
 path_csv = os.path.join(base_path, 'raw_investopedia.csv')
 db_name = os.path.splitext(os.path.basename(path_csv))[0] + '_db'
@@ -15,18 +15,16 @@ PERSIST_DIRECTORY = os.path.join(base_path, db_name)
 llama3 = ChatGroq(model="llama3-8b-8192")
 finlang_embed = HuggingFaceEmbeddings(model_name='FinLang/finance-embeddings-investopedia')  # modèle entraîné sur des blogs financiers
 
-#%%
-# Automatically creates the database if it does not exist at PERSIST_DIRECTORY from the path_csv
-# if the database already exists, the csv path is not used
-db = rag.load_chromadb(PERSIST_DIRECTORY, finlang_embed, 
-                       csv_dir = path_csv, separator = '\t') 
+# Either path_csv or PERSIST_directory should be not none
+# if the database already exists, the csv_path is not used
+RAG = rag.RAG(path_csv, PERSIST_DIRECTORY, llama3,
+             finlang_embed, csv_separator = '\t') 
 
-#%%
-retriever = db.as_retriever(search_kwargs = {'k':3,})
+#%% Example
 # q = "What can you tell me about the 403(b) ?"
 q = "What can you tell me about bankruptcy ?"
-q = "What can you tell me about financial statements ? "
-print(rag.retrieve_answer(q,
-                      retriever,
-                      llama3,
+q = "What can you tell me about financial statements ?"
+q = "What can you tell me about strategie to reduce taxations ?"
+q = "Should I sell or buy bad performing stocks ?"
+print(RAG.retrieve_answer(q,
                       print_context = False))

@@ -10,77 +10,89 @@ from langchain_groq import ChatGroq
 from types import SimpleNamespace
 from tqdm import tqdm
 
-def load_csv_to_documents(path_csv, separator='\t'):
-    try:
-        df = pd.read_csv(path_csv, encoding="utf-8", sep=separator) #encoding="windows-1252"
-    except Exception as e:
-        print(f"Error reading the CSV file: {path_csv}")
-        print(f"Exception: {e}")
-        return []
-    
-    documents = []
-    print('Total number of documents : ', df.shape[0])
-    for index, row in tqdm(df.iterrows()):
+
+class RAG:
+    def __init__(self, csv_path, db_path, model,
+                 embedding_function, csv_separator = '\t'):
+        if csv_path is None and db_path is None:
+            raise ValueError('Either csv_path or db_path needs to be specified')
+        self.csv_path = csv_path
+        self.db_path= db_path
+        self.model = model
+        self.embedding_function = embedding_function
+        self.csv_separator = csv_separator
+        self.retriever = None
+        self.__load_chromadb()
+        
+        return None
+
+    def __load_csv_to_documents(self):
         try:
-            document = SimpleNamespace(
-                page_content=f"{row['Method Name']}: {row['Definition']}",
-                metadata={'method_name': row['Method Name']}
-            )
-            documents.append(document)
+            df = pd.read_csv(self.path_csv, encoding="utf-8", sep=self.csv_separator) #encoding="windows-1252"
         except Exception as e:
-            document = SimpleNamespace(
-                page_content=f"{row[0]}",
-                metadata={}
-            )
-            documents.append(document)
-    return documents
-
-def load_chromadb(cache_dir, embedding_function, csv_dir = None, separator='\t'):
-    if os.path.exists(cache_dir):
-        #print("Loading Chroma database")
-        db = Chroma(persist_directory=cache_dir, embedding_function=embedding_function)
-    else:
-        if csv_dir is None:
-            raise FileNotFoundError('Did not find a cached database and no csv path provided.')
-        print("No cached database found. Creating Chroma database.")
-        documents = load_csv_to_documents(csv_dir)
-        db = Chroma.from_documents(documents=documents, 
-                                   embedding=embedding_function, 
-                                   persist_directory=cache_dir)
-        db.persist()
-    return db
+            print(f"Error reading the CSV file: {self.path_csv}")
+            print(f"Exception: {e}")
+            return []
         
-        
-def retrieve_answer(question, retriever, model, print_context = False):
-    template = """Answer the question based only on the following context:
-    {context}
-
-    Question: {question}
-    """
-    if print_context:
-        print(retriever.invoke(question))
-    prompt = ChatPromptTemplate.from_template(template)
-    chain = (
-        {"context": retriever, 
-         "question": RunnablePassthrough()}
-        | prompt
-        | model
-        | StrOutputParser()
-    )
-    return chain.invoke(question)
-
-
-if __name__ == "__main__":
-    PATH_CSV = 'Data/Financial_and_Technical_Analysis_Methods_t.csv'
-    db_name = os.path.splitext(os.path.basename(PATH_CSV))[0] + '_db.pkl'
-    PERSIST_DIRECTORY = os.path.join('Data', db_name)
-    llama3 = ChatGroq(model="llama3-8b-8192")
-    finlang_embed = HuggingFaceEmbeddings(model_name='FinLang/finance-embeddings-investopedia')  # modèle entraîné sur des blogs financiers
+        documents = []
+        print('Total number of documents : ', df.shape[0])
+        for index, row in tqdm(df.iterrows()):
+            try:
+                document = SimpleNamespace(
+                    page_content=f"{row['Method Name']}: {row['Definition']}",
+                    metadata={'method_name': row['Method Name']}
+                )
+                documents.append(document)
+            except Exception as e:
+                document = SimpleNamespace(
+                    page_content=f"{row[0]}",
+                    metadata={}
+                )
+                documents.append(document)
+        return documents
     
-    db = load_chromadb(PERSIST_DIRECTORY, finlang_embed)
-    retriever = db.as_retriever()
-    print(retrieve_answer("List five methods that are based on average calculation.",
-                          retriever,
-                          llama3))
+    def __load_chromadb(self):
+        if os.path.exists(self.db_path):
+            #print("Loading Chroma database")
+            db = Chroma(persist_directory=self.db_path, embedding_function=self.embedding_function)
+        else:
+            if self.csv_path is None:
+                raise FileNotFoundError('Did not find a cached database and no csv path provided.')
+            print("No cached database found. Creating Chroma database.")
+            documents = self.load_csv_to_documents(self.csv_path)
+            db = Chroma.from_documents(documents=documents, 
+                                       embedding=self.embedding_function, 
+                                       persist_directory=self.db_path)
+            db.persist()
+        self.db = db
+        return None
+            
+    def create_retriever(self, search_kwargs):
+        # It is automatically called in retrieve_answer if the retriever has not been created manually
+        # I leave the option to call it manually to be able to change the search_kwargs
+        self.retriever = self.db.as_retriever(search_kwargs = search_kwargs)
+        return None
+    
+    def retrieve_answer(self, question, print_context = False):
+        template = """Answer the question based only on the following context:
+        {context}
+    
+        Question: {question}
+        """
+        if self.retriever is None:
+            self.create_retriever(search_kwargs = {'k':2,})
+        if print_context:
+            print(retriever.invoke(question))
+        prompt = ChatPromptTemplate.from_template(template)
+        chain = (
+            {"context": self.retriever, 
+             "question": RunnablePassthrough()}
+            | prompt
+            | self.model
+            | StrOutputParser()
+        )
+        return chain.invoke(question)
+
+
 
 
