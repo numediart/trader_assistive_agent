@@ -5,7 +5,7 @@ from langchain_core.runnables import RunnablePassthrough
 from langchain_huggingface import HuggingFaceEmbeddings
 import os
 import pandas as pd
-# os.environ["GROQ_API_KEY"] 
+os.environ["GROQ_API_KEY"] 
 from langchain_groq import ChatGroq
 from types import SimpleNamespace
 from tqdm import tqdm
