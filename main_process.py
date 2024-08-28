@@ -6,4 +6,6 @@ from rag_csv import retrieve_answer
 # 2) SPONTANOUS COMMUNICATION WITH USER WHEN SPECIFIC STATES DETECTED (STRESS, HIGH RISK TRANSACTION REQUEST)
 # => BIOSIG INTO PROMPT
 # 3) FILL UP A SURVEY WITH THE AVATAR
+from s2s.s2s_pipeline import pipeline
 
+pipeline()

@@ -1,0 +1,3 @@
+[submodule "speech-to-speech"]
+	path = s2s
+	url = https://github.com/HuBohy/speech-to-speech
