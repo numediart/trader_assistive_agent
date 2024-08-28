@@ -1,2 +1,6 @@
+__pycache__/
+*.pyc
+.huggingface
+mlx_models
 Tools/
-__pycache__
+trail_env
