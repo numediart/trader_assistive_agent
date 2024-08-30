@@ -3,17 +3,25 @@ from langchain_community.vectorstores import Chroma
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.runnables import RunnablePassthrough
 from langchain_huggingface import HuggingFaceEmbeddings
+from langchain_groq import ChatGroq
 import os
 import pandas as pd
 # os.environ["GROQ_API_KEY"] 
 from langchain_groq import ChatGroq
 from types import SimpleNamespace
 from tqdm import tqdm
+from transformers import (
+    AutoModelForCausalLM,
+    AutoTokenizer,
+    pipeline,
+    TextIteratorStreamer,
+)
 
 
 class RAG:
     def __init__(self, csv_path, db_path, model,
                  embedding_function, csv_separator = '\t'):
+        # tokenizer is not needed when using ChatGroq
         if csv_path is None and db_path is None:
             raise ValueError('Either csv_path or db_path needs to be specified')
         self.csv_path = csv_path
@@ -73,25 +81,40 @@ class RAG:
         self.retriever = self.db.as_retriever(search_kwargs = search_kwargs)
         return None
     
-    def retrieve_answer(self, question, print_context = False):
-        template = """Answer the question based only on the following context:
-        {context}
-    
-        Question: {question}
-        """
+    def retrieve_answer(self, question, print_context = False, kwargs = {}):
         if self.retriever is None:
             self.create_retriever(search_kwargs = {'k':2,})
-        if print_context:
-            print(self.retriever.invoke(question))
-        prompt = ChatPromptTemplate.from_template(template)
-        chain = (
-            {"context": self.retriever, 
-             "question": RunnablePassthrough()}
-            | prompt
-            | self.model
-            | StrOutputParser()
-        )
-        return chain.invoke(question)
+        if type(self.model) is ChatGroq:
+            # if there is no tokenizer we use Groq
+            template = """Answer succinctly the question based on the following context:
+            {context}
+        
+            Question: {question}
+            """
+            if print_context:
+                print(self.retriever.invoke(question))
+            prompt = ChatPromptTemplate.from_template(template)
+            chain = (
+                {"context": self.retriever, 
+                 "question": RunnablePassthrough()}
+                | prompt
+                | self.model
+                | StrOutputParser()
+            )
+            out = chain.invoke(question)
+        else:
+            context = self.retriever.invoke(question)
+            if print_context:
+                print(context)
+            template = f"""Answer succinctly the question based on the following context:
+            {context}
+        
+            Question: {question}
+            """
+            raw = self.model(template, **kwargs)
+            start = len(template)+11
+            out = raw[0]['generated_text'][start:]
+        return out
 
 
 
