@@ -84,6 +84,7 @@ class RAG:
         if print_context:
             print(self.retriever.invoke(question))
         prompt = ChatPromptTemplate.from_template(template)
+        # block the thread here ?
         chain = (
             {"context": self.retriever, 
              "question": RunnablePassthrough()}
@@ -91,7 +92,9 @@ class RAG:
             | self.model
             | StrOutputParser()
         )
-        return chain.invoke(question)
+        results = chain.invoke(question)
+        return results
+        # return self.retriever(prompt, self.model)
 
 
 
