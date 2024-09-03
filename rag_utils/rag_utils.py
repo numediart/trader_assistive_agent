@@ -28,9 +28,9 @@ class RAG:
 
     def __load_csv_to_documents(self):
         try:
-            df = pd.read_csv(self.path_csv, encoding="utf-8", sep=self.csv_separator) #encoding="windows-1252"
+            df = pd.read_csv(self.csv_path, encoding="utf-8", sep=self.csv_separator) #encoding="windows-1252"
         except Exception as e:
-            print(f"Error reading the CSV file: {self.path_csv}")
+            print(f"Error reading the CSV file: {self.csv_path}")
             print(f"Exception: {e}")
             return []
         
@@ -59,7 +59,7 @@ class RAG:
             if self.csv_path is None:
                 raise FileNotFoundError('Did not find a cached database and no csv path provided.')
             print("No cached database found. Creating Chroma database.")
-            documents = self.load_csv_to_documents(self.csv_path)
+            documents = self.__load_csv_to_documents()
             db = Chroma.from_documents(documents=documents, 
                                        embedding=self.embedding_function, 
                                        persist_directory=self.db_path)
