@@ -1,10 +1,9 @@
-from s2s.baseHandler import BaseHandler
 import logging
 
 logger = logging.getLogger(__name__)
 
-class DialogManagerHandler(BaseHandler):
-    def setup(
+class DialogManagerHandler:
+    def __init__(
             self, 
             device="cpu",
             rag=None,
@@ -13,14 +12,8 @@ class DialogManagerHandler(BaseHandler):
         self.device = device
         self.rag=rag
         self.prompt_creator=prompt_creator
-        self.warmup()
-
-    def warmup(self):
-        logger.info(f"Warming up {self.__class__.__name__}")
-        _ = self.choice["question"]
         
     def process(self, prompt):
-        prompt = prompt.decode("utf-8")
         text_type = "question" if prompt.endswith("?") else "prompt"
 
         if text_type == "question":
@@ -32,4 +25,4 @@ class DialogManagerHandler(BaseHandler):
             # request spontaneous answer
             answer = "chill dude..."
 
-        yield answer
+        return answer

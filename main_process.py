@@ -12,6 +12,9 @@ from audio_streamer import LocalAudioStreamer
 from VAD.vad import VAD
 from ASR.lightning_whisper_mlx import LightningWhisperASR
 from ASR.whisper_asr import WhisperASR
+from dialog_manager import DialogManagerHandler
+from rag_example import RAG
+
 
 should_listen = threading.Event()
 should_listen.set()
@@ -21,6 +24,8 @@ rcv_audio_chuncks_queue = Queue()
 local_audio_streamer = LocalAudioStreamer(input_queue=rcv_audio_chuncks_queue)
 vad = VAD(should_listen)
 asr = LightningWhisperASR(device="mps")
+dm = DialogManagerHandler(rag=RAG)
+
 
 thread = threading.Thread(target=local_audio_streamer.start)
 thread.start()
@@ -30,4 +35,6 @@ while True:
     spoken_prompt_queue = vad.process(mic_data)
     if spoken_prompt_queue is not None:
         prompt = asr.process(spoken_prompt_queue)
+        
         # do Dialog Manager
+        dm_output = dm.process(prompt)
