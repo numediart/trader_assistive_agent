@@ -5,7 +5,7 @@ import os
 # You might need to setup your grok api key
 # os.environ["GROQ_API_KEY"]  = ""
 from langchain_groq import ChatGroq
-from rag_utils import rag_utils as rag
+from utils import rag_utils as rag
 #%% Init the rag.RAG object
 base_path = './Data' #You might need to edit it
 path_csv = os.path.join(base_path, 'raw_investopedia.csv')
