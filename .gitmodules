@@ -1,3 +1,7 @@
 [submodule "speech-to-speech"]
 	path = s2s
-	url = https://github.com/HuBohy/speech-to-speech
+	url = https://github.com/HuBohy/speech-to-speech.git
+[submodule "ACT"]
+	path = ACT
+	url = git@github.com:numediart/ACT.git
+	branch = lipsync
