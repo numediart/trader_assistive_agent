@@ -1,4 +1,5 @@
 # RECEIVE DATA FROM QUEUING SYSTEM
+import threading
 
 # RULES TO DECIDE THE ACTION OF THE AGENT
 # 1) RESPOND TO FIAANCE/INVESTING RELATED QUESTIONS => CALL RAG SYSTEM
@@ -7,4 +8,8 @@
 # 3) FILL UP A SURVEY WITH THE AVATAR
 from VAD.vad import VAD
 
-vad = VAD()
+should_listen = threading.Event()
+should_listen.set()
+
+
+vad = VAD(should_listen)

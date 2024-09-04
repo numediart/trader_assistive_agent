@@ -18,7 +18,7 @@ class VAD:
     to the following part.
     """
 
-    def setup(
+    def __init__(
         self,
         should_listen,
         thresh=0.3,
