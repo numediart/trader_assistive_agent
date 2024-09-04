@@ -3,7 +3,7 @@ import os
 from langchain_huggingface import HuggingFaceEmbeddings
 import os
 # You might need to setup your grok api key
-# os.environ["GROQ_API_KEY"]  = ""
+# os.environ["GROQ_API_KEY"]
 from langchain_groq import ChatGroq
 
 import sys
@@ -27,12 +27,13 @@ RAG = rag.RAG(path_csv, PERSIST_DIRECTORY, llama3,
              finlang_embed, csv_separator = '\t') 
 RAG.create_retriever(search_kwargs = {'k':10})
 #%% Example with RAG
-# q = "What can you tell me about the 403(b) ?"
 q = '''Can you give a small overwiev of the Fear of Missing out phenomenon,
 why it should be avoided and how to avoid it when trading ? Which kind of routine could a trader
 implement to avoid FOMO ?'''
-print(RAG.retrieve_answer(q,
-                      print_context = False))
+rag_answer = RAG.retrieve_answer(q,
+                      print_context = False)
+print('\n\n ============ WITH RAG ================== \n\n')
+print(rag_answer)
 
 #%% Test without RAG
 from langchain_core.output_parsers import StrOutputParser

@@ -66,7 +66,14 @@ class RAG:
             db.persist()
         self.db = db
         return None
-            
+      
+    # TODO: The below code creates duplicates
+    # def update(self):
+    #     documents = self.__load_csv_to_documents()
+    #     for doc in documents:
+    #         self.db.add_documents(doc)
+    #     return None
+        
     def create_retriever(self, search_kwargs):
         # It is automatically called in retrieve_answer if the retriever has not been created manually
         # I leave the option to call it manually to be able to change the search_kwargs
