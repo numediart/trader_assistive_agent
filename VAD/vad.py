@@ -57,4 +57,4 @@ class VAD:
             else:
                 self.should_listen.clear()
                 logger.debug("Stop listening")
-                yield array
+                return array

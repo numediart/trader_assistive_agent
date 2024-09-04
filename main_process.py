@@ -15,7 +15,6 @@ should_listen = threading.Event()
 should_listen.set()
 
 rcv_audio_chuncks_queue = Queue()
-spoken_prompt_queue = Queue()
 
 local_audio_streamer = LocalAudioStreamer(input_queue=rcv_audio_chuncks_queue)
 vad = VAD(should_listen)
@@ -24,9 +23,8 @@ thread = threading.Thread(target=local_audio_streamer.run)
 thread.start()
 print("started recording")
 while True:
-    if rcv_audio_chuncks_queue.not_empty:
-        spoken_prompt_queue.put(vad.process(rcv_audio_chuncks_queue.get()))
-
     if spoken_prompt_queue.not_empty:
         pass
-        # do ASR
+        # do ASR    spoken_prompt_queue = vad.process(mic_data)
+    if spoken_prompt_queue is not None:
+        # do Dialog Manager
