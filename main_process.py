@@ -15,18 +15,22 @@ from dialog_manager import DialogManagerHandler
 from TTS.melo import MeloTTS
 from rag_example import RAG
 
+import matplotlib.pyplot as plt
+import numpy as np
 
 should_listen = threading.Event()
 should_listen.set()
 
 rcv_audio_chuncks_queue = Queue()
+send_audio_chuncks_queue = Queue()
 
-local_audio_streamer = LocalAudioStreamer(input_queue=rcv_audio_chuncks_queue)
+local_audio_streamer = LocalAudioStreamer(input_queue=rcv_audio_chuncks_queue, output_queue=send_audio_chuncks_queue)
 vad = VAD(should_listen)
 asr = LightningWhisperASR(device="mps")
 dm = DialogManagerHandler(rag=RAG)
 tts = MeloTTS(should_listen)
 
+blocksize = 512
 
 thread = threading.Thread(target=local_audio_streamer.start)
 thread.start()
@@ -43,5 +47,10 @@ while True:
         dm_output = dm.process(prompt)
 
         audio_output = tts.process(dm_output)
+        for i in range(0, len(audio_output), blocksize):
+            local_audio_streamer.output_queue.put(np.pad(
+                audio_output[i : i + blocksize],
+                (0, blocksize - len(audio_output[i : i + blocksize])),
+            ))
         should_listen = tts.should_listen
         

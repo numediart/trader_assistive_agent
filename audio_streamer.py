@@ -12,20 +12,26 @@ class LocalAudioStreamer:
     def __init__(
         self,
         input_queue,
+        output_queue,
         list_play_chunk_size=512,
     ):
         self.list_play_chunk_size = list_play_chunk_size
 
         self.stop_event = threading.Event()
         self.input_queue = input_queue
+        self.output_queue = output_queue
 
     def start(self):
-        def callback(indata, frames, time, status):
-            self.input_queue.put(indata.copy())
+        def callback(indata, outdata, frames, time, status):
+            if self.output_queue.empty():
+                self.input_queue.put(indata.copy())
+                outdata[:] = 0 * outdata
+            else:
+                outdata[:] = self.output_queue.get()[:, np.newaxis]
 
         logger.debug("Available devices:")
         logger.debug(sd.query_devices())
-        with sd.InputStream(
+        with sd.Stream(
             samplerate=16000,
             dtype="int16",
             channels=1,
