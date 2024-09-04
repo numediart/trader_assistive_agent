@@ -11,7 +11,6 @@ import threading
 from audio_streamer import LocalAudioStreamer
 from VAD.vad import VAD
 from ASR.lightning_whisper_mlx import LightningWhisperASR
-from ASR.whisper_asr import WhisperASR
 from dialog_manager import DialogManagerHandler
 from rag_example import RAG
 
