@@ -19,7 +19,7 @@ class LocalAudioStreamer:
         self.stop_event = threading.Event()
         self.input_queue = input_queue
 
-    def run(self):
+    def start(self):
         def callback(indata, frames, time, status):
             self.input_queue.put(indata.copy())
 

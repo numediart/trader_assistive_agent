@@ -10,6 +10,8 @@ import threading
 
 from audio_streamer import LocalAudioStreamer
 from VAD.vad import VAD
+from ASR.lightning_whisper_mlx import LightningWhisperASR
+from ASR.whisper_asr import WhisperASR
 
 should_listen = threading.Event()
 should_listen.set()
@@ -18,13 +20,14 @@ rcv_audio_chuncks_queue = Queue()
 
 local_audio_streamer = LocalAudioStreamer(input_queue=rcv_audio_chuncks_queue)
 vad = VAD(should_listen)
+asr = LightningWhisperASR(device="mps")
 
-thread = threading.Thread(target=local_audio_streamer.run)
+thread = threading.Thread(target=local_audio_streamer.start)
 thread.start()
 print("started recording")
 while True:
-    if spoken_prompt_queue.not_empty:
-        pass
-        # do ASR    spoken_prompt_queue = vad.process(mic_data)
+    mic_data = local_audio_streamer.input_queue.get()
+    spoken_prompt_queue = vad.process(mic_data)
     if spoken_prompt_queue is not None:
+        prompt = asr.process(spoken_prompt_queue)
         # do Dialog Manager
