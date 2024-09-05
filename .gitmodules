@@ -1,3 +1,9 @@
 [submodule "speech-to-speech"]
 	path = s2s
 	url = https://github.com/HuBohy/speech-to-speech
+[submodule "scopus/python-scopus"]
+	path = scopus/python-scopus
+	url = https://github.com/cfuchs2023/python-scopus
+[submodule "python-scopus"]
+	path = python-scopus
+	url = https://github.com/cfuchs2023/python-scopus
