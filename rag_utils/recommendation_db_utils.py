@@ -7,7 +7,7 @@ import numpy as np
 import time
 import pypdf
 from langchain_core.output_parsers import StrOutputParser
-os.environ["GROQ_API_KEY"] = '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'
+# os.environ["GROQ_API_KEY"]
 from pyscopus import Scopus
 from langchain_groq import ChatGroq
 #Used to filter out irrelevant information such as line numbers, author list, references list etc...

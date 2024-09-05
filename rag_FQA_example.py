@@ -6,7 +6,7 @@ import sys
 path_ = "E:/github/multisensor_llm"
 if not(path_ in sys.path):
     sys.path.insert(0,path_)
-os.environ["GROQ_API_KEY"]  = "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"
+# os.environ["GROQ_API_KEY"]
 from langchain_groq import ChatGroq
 from rag_utils import rag_utils as rag
 #%% Init the rag.RAG object

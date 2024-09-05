@@ -2,7 +2,7 @@
 import os
 from langchain_huggingface import HuggingFaceEmbeddings
 # You might need to setup your grok api key
-os.environ["GROQ_API_KEY"] = "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"
+os.environ["GROQ_API_KEY"] = ""
 from langchain_groq import ChatGroq
 
 import sys
