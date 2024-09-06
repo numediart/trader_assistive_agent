@@ -80,13 +80,13 @@ class RAG:
         return None
     
     def retrieve_answer(self, question, max_context = 20000, print_context = False):
-        template = """Answer the question based only on the following context:
+        template = """Answer the question based with the help of the following context:
         {context}
     
         Question: {question}
         """
         if self.retriever is None:
-            self.create_retriever(search_kwargs = {'k':3,})
+            self.create_retriever(search_kwargs = {'k':10,})
         documents = self.retriever.invoke(question)
         context = '. '.join([d.page_content for d in documents])
         if print_context:

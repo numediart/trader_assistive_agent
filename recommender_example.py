@@ -2,7 +2,7 @@
 import os
 from langchain_huggingface import HuggingFaceEmbeddings
 # You might need to setup your grok api key
-os.environ["GROQ_API_KEY"] = ""
+# os.environ["GROQ_API_KEY"]
 from langchain_groq import ChatGroq
 
 import sys
@@ -23,11 +23,11 @@ llama3 = ChatGroq(model="llama3-8b-8192")
 finlang_embed = HuggingFaceEmbeddings(model_name='FinLang/finance-embeddings-investopedia')  
 RAG = ragu.RAG(dataframe_path, cache_dir, llama3,
              finlang_embed) 
-RAG.create_retriever({'k':4,})
+RAG.create_retriever({'k':10,})
 #%% instantiate recommender object
 recommender = recu.Recommender(llama3, RAG)
 
 #%% Get a recommendation
 # Sometimes the retrieved documents are not very useful, maybe look into search_kwargs ??
-reco = recommender.get_recommendation('FOMO')
+reco = recommender.get_recommendation('There is a potential FOMO and the trader is angry.')
 print(reco)

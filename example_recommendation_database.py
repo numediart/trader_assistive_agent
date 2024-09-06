@@ -20,7 +20,7 @@ db = redu.RecommendationDatabase('E:/github/multisensor_llm/Data/Recommendation'
 
 # visit http://zhiyzuo.github.io/python-scopus/doc/quick-start.html and https://dev.elsevier.com/tecdoc_text_mining.html to learn more about the scopus api 
 # The database can be populated from the scopus api
-db.add_documents_from_scopus('KEY(Fear of missing out)', {'count':5}) # Scraps scopus according to the search_str and adds the documents to the metadata
+db.add_documents_from_scopus('KEY(Greed Trading)', {'count':50}) # Scraps scopus according to the search_str and adds the documents to the metadata
 
 # The database can be populated from pdf files place in /Data/Recommendation/raw_pdf
 # The name of the pdf should be the doi of the scientific article where '/' has been replaced by '_'
