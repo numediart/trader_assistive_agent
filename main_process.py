@@ -41,11 +41,13 @@ while True:
     spoken_prompt_queue = vad.process(mic_data)
     should_listen = vad.should_listen
     if spoken_prompt_queue is not None and not should_listen.is_set():
+        # ASR
         prompt = asr.process(spoken_prompt_queue)
         
         # do Dialog Manager
         dm_output = dm.process(prompt)
 
+        # TTS
         audio_output = tts.process(dm_output)
         for i in range(0, len(audio_output), blocksize):
             local_audio_streamer.output_queue.put(np.pad(
